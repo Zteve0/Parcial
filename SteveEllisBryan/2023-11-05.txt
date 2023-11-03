@@ -1,0 +1,2 @@
+ID=5, Monto=100000.0, Emisor=PersonaJuridica, Receptor=ONG, Hora=12, Ciudad=CiudadX
+ID=5, Monto=100000.0, Emisor=PersonaJuridica, Receptor=ONG, Hora=12, Ciudad=CiudadX
