@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Persona {
@@ -7,19 +8,21 @@ public class Persona {
         Scanner scanner = new Scanner(System.in);
         String[] diaSem = {"lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"};
 
-        String[][] data = new String[7][100];
+        ArrayList<String[]> dataList = new ArrayList<>();
         double[] maxValorPorDia = new double[7];
 
         // Leer datos de archivos y calcular los máximos por día
         for (int i = 0; i < 7; i++) {
-            String fileName = "C:\\Users\\Steve Ellis\\Desktop\\Archivos txt\\" + diaSem[i] + ".txt";
+            String fileName = "C:\\Users\\Steve Ellis\\Final Logica\\SteveEllisBryan\\" + diaSem[i] + ".txt";
             double maxDiaValor = 0.0;
 
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 String line;
                 int a = 0;
+                ArrayList<String> dayData = new ArrayList<>();
+
                 while ((line = br.readLine()) != null) {
-                    data[i][a] = line;
+                    dayData.add(line);
                     String[] parts = line.split(";");
                     if (parts.length >= 5) {
                         double valor = Double.parseDouble(parts[1]);
@@ -29,8 +32,9 @@ public class Persona {
                     }
                     a++;
                 }
+                dataList.add(dayData.toArray(new String[0]));
                 maxValorPorDia[i] = maxDiaValor;
-            } catch (Exception e) {
+            } catch (IOException | NumberFormatException e) {
                 System.out.println("Error al leer el archivo de " + diaSem[i] + ": " + e.getMessage());
             }
         }
@@ -64,21 +68,39 @@ public class Persona {
                     }
                     break;
                 case 2:
-                    findMaxColumn2Value(data);
+                    findMaxColumn2Value(dataList);
                     break;
                 case 3:
-                    System.out.print("Ingrese un ID para buscar información: ");
-                    String idToFind = scanner.nextLine();
-                    // Implementa la lógica para encontrar información por ID
+                System.out.print("Ingrese un ID para buscar información: ");
+                String idToFind = scanner.nextLine();
+            
+                boolean found = false;
+                for (String[] dayData : dataList) {
+                    for (String entry : dayData) {
+                        String[] parts = entry.split(";");
+                        if (parts.length >= 1 && parts[0].equals(idToFind)) {
+                            // Se encontró la información con el ID proporcionado
+                            System.out.println("Información encontrada:");
+                            System.out.println(entry);
+                            found = true;
+                            break;  // Sale del bucle interno si encuentra el ID
+                        }
+                    }
+                    if (found) {
+                        break;  // Sale del bucle externo si encuentra el ID
+                    }
+                }
+            
+                if (!found) {
+                    System.out.println("No se encontró información con el ID proporcionado.");
+                }
                     break;
                 case 4:
                     System.out.println("Datos disponibles:");
                     for (int i = 0; i < 7; i++) {
                         System.out.println(diaSem[i] + ": ");
-                        for (int a = 0; a < data[i].length; a++) {
-                            if (data[i][a] != null) {
-                                System.out.println(data[i][a]);
-                            }
+                        for (String entry : dataList.get(i)) {
+                            System.out.println(entry);
                         }
                     }
                     break;
@@ -93,21 +115,19 @@ public class Persona {
         }
     }
 
-    private static void findMaxColumn2Value(String[][] data) {
+    private static void findMaxColumn2Value(ArrayList<String[]> dataList) {
         double maxColumna2Valor = 0.0;
 
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < data[i].length; j++) {
-                if (data[i][j] != null) {
-                    String[] parts = data[i][j].split(";");
-                    if (parts.length >= 5) {
-                        try {
-                            double columna2Valor = Double.parseDouble(parts[4]);
-                            if (columna2Valor > maxColumna2Valor) {
-                                maxColumna2Valor = columna2Valor;
-                            }
-                        } catch (NumberFormatException e) {
+        for (String[] dayData : dataList) {
+            for (String entry : dayData) {
+                String[] parts = entry.split(";");
+                if (parts.length >= 5) {
+                    try {
+                        double columna2Valor = Double.parseDouble(parts[4]);
+                        if (columna2Valor > maxColumna2Valor) {
+                            maxColumna2Valor = columna2Valor;
                         }
+                    } catch (NumberFormatException ignored) {
                     }
                 }
             }
